@@ -1,6 +1,4 @@
-﻿using Natasha;
-using Natasha.MethodExtension;
-using Natasha.Operator;
+﻿using Natasha.CSharp;
 using System;
 using System.Diagnostics;
 using System.Reflection.Emit;
@@ -15,24 +13,30 @@ namespace Core22
             {
                 throw new ArgumentNullException(nameof(args));
             }
-            var action = FastMethodOperator.New
-                .MethodBody("return 1+1;")
+            var action = FastMethodOperator.DefaultDomain()
+                .Body("return 1+1;")
                 .Return<int>()
-                .Complie<Func<int>>();
+                .Compile<Func<int>>();
 
             action();
 
 
-            FakeMethodOperator.New
+            FakeMethodOperator.RandomDomain(item=> {
+                item.AssemblyName = "1";
+                item.OutputToFile = true;
+                })
                .UseMethod<TestB>("TestMethod")
-               .StaticMethodContent($@"Console.WriteLine(""Hello World!"");")
-               .Complie<Action>();
+               .StaticMethodBody($@"Console.WriteLine(""Hello World!"");")
+               .Compile<Action>();
 
 
-            FakeMethodOperator.New
+            FakeMethodOperator.RandomDomain(item => {
+                item.AssemblyName = "1";
+                item.OutputToFile = true;
+            })
                 .UseMethod<TestB>("TestMethod")
-                .MethodContent($@"Console.WriteLine(""Hello World!"");")
-                .Complie<Action>(new TestA());
+                .MethodBody($@"Console.WriteLine(""Hello World!"");")
+                .Compile<Action>(new TestA());
 
             
 
@@ -45,50 +49,25 @@ namespace Core22
              *      <PreserveCompilationContext>true</PreserveCompilationContext>
              */
 
-            ProxyOperator<TestAbstract> abstractBuilder = new ProxyOperator<TestAbstract>();
-            abstractBuilder.OopName("UTestClass");
-            abstractBuilder["GetName"] = "return Name;";
-            abstractBuilder["GetAge"] = "return Age;";
-            abstractBuilder.Compile();
-            var test = abstractBuilder.Create("UTestClass");
+            //ProxyOperator<TestAbstract> abstractBuilder = new ProxyOperator<TestAbstract>();
+            //abstractBuilder.OopName("UTestClass");
+            //abstractBuilder["GetName"] = "return Name;";
+            //abstractBuilder["GetAge"] = "return Age;";
+            //abstractBuilder.Compile();
+            //var test = abstractBuilder.CreateProxy("UTestClass");
 
-            var delegate2 = DelegateOperator<GetterDelegate>.Delegate("return value.ToString();");
-            Console.WriteLine(delegate2(1));
-            var delegate3 = "return value.ToString();".Delegate<GetterDelegate>();
-            var delegateConvt = FastMethodOperator.New
-                .Param<string>("value")
-                .MethodBody($@"return value==""true"" || value==""mama"";")
-                .Return<bool>()
-                .Complie<Func<string, bool>>();
+            //var delegate2 = NDelegateOperator<GetterDelegate>.Delegate("return value.ToString();");
+            //Console.WriteLine(delegate2(1));
+            //var delegate3 = "return value.ToString();".Delegate<GetterDelegate>();
+            //var delegateConvt = FastMethodOperator.Create()
+            //    .Param<string>("value")
+            //    .MethodBody($@"return value==""true"" || value==""mama"";")
+            //    .Return<bool>()
+            //    .Compile<Func<string, bool>>();
 
-            Console.WriteLine(delegateConvt("mama"));
+            //Console.WriteLine(delegateConvt("mama"));
 
-            string text = @"using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
- 
-namespace HelloWorld
-{
-    public class Test
-    {
-        public Test(){
-            Name=""111"";
-            Instance = new Test1();
-        }
-
-        public string Name;
-        public int Age{get;set;}
-        public Test1 Instance;
-    }
-    public class Test1{
-         public string Name=""1"";
-    }
-}";
-            OopComplier oop = new OopComplier();
-            //根据脚本创建动态类
-            Type type = oop.GetClassType(text);
-
+           
 
             DynamicMethod method = new DynamicMethod("GetString", null, new Type[] { typeof(TestB), typeof(string) });
             ILGenerator il = method.GetILGenerator();
@@ -98,12 +77,11 @@ namespace HelloWorld
             il.Emit(OpCodes.Ret);
             var emitAction = (Action<TestB, string>)(method.CreateDelegate(typeof(Action<TestB, string>)));
 
-            var roslynAction = FastMethodOperator.New
+            var roslynAction = FastMethodOperator.DefaultDomain()
                 .Param<TestB>("instance")
                 .Param<string>("value")
-                .MethodBody("instance.Name = value;")
-                .Return()
-                .Complie<Action<TestB, string>>();
+                .Body("instance.Name = value;")
+                .Compile<Action<TestB, string>>();
 
 
             Stopwatch stopwatch = new Stopwatch();

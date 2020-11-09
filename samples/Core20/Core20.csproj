@@ -3,7 +3,6 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -11,7 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Natasha\Natasha.csproj" />
+    <ProjectReference Include="..\..\src\Natasha.CSharp\Natasha.CSharp.All\Natasha.CSharp.All.csproj" />
   </ItemGroup>
+
+
 
 </Project>

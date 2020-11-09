@@ -1,6 +1,8 @@
-﻿using Natasha;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Natasha;
+using Natasha.CSharp;
 using System;
-using Natasha.MethodExtension;
 
 namespace Core20
 {
@@ -8,15 +10,8 @@ namespace Core20
     {
         static void Main(string[] args)
         {
-            /*
-             *   在此之前，你需要右键，选择工程文件，在你的.csproj里面 
-             *   
-             *   写上这样一句浪漫的话： 
-             *   
-             *      <PreserveCompilationContext>true</PreserveCompilationContext>
-             */
 
-
+            NatashaInitializer.InitializeAndPreheating();
             string text = @"namespace HelloWorld
 {
     public class Test
@@ -30,14 +25,20 @@ namespace Core20
     }
 }";
             //根据脚本创建动态类
-            OopComplier oop = new OopComplier();
-            Type type = oop.GetClassType(text);
+            AssemblyCSharpBuilder oop = new AssemblyCSharpBuilder("test");
+            oop.Add(text);
+            Type type = oop.GetTypeFromShortName("Test");
 
+            Console.WriteLine(type.Name);
 
-            var func = "return arg;".Delegate<Func<string, string>>();
-            Console.WriteLine(func("111"));
-
+            var action = NDelegate.RandomDomain().Action("");
+            var a = action.Method;
+            Console.WriteLine(action.Method.Module.Assembly);
+            Console.WriteLine(DomainManagement.IsDeleted(action.GetDomain().Name));
             Console.ReadKey();
         }
+
+
     }
+
 }

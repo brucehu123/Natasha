@@ -1,24 +1,23 @@
-﻿using Natasha;
-using Natasha.Template;
+﻿using Natasha.CSharp.Builder;
 using Xunit;
 
 namespace NatashaUT
 {
     [Trait("快速构建","初始化函数")]
-    public class DynamicCtorTest
+    public class DynamicCtorTest : PrepareTest
     {
 
         [Fact(DisplayName ="公有初始化函数")]
         public void TestCtor1()
         {
-            CtorTemplate ctor = new CtorTemplate();
+            CtorBuilder ctor = new CtorBuilder();
             string result = ctor.Name("Test")
-                .MemberAccess(AccessTypes.Public)
+                .Access(AccessFlags.Public)
                 .Param<string>("initString")
                 .Body("this.connection = initString;")
-                .Builder().Script;
+                .Script;
 
-            Assert.Equal("public Test(String initString){this.connection = initString;}", result);
+            Assert.Equal($"public Test(System.String initString){{this.connection = initString;}}", result);
         }
 
 
@@ -26,13 +25,13 @@ namespace NatashaUT
         [Fact(DisplayName = "私有初始化函数")]
         public void TestCtor2()
         {
-            CtorTemplate ctor = new CtorTemplate();
+            CtorBuilder ctor = new CtorBuilder();
             string result = ctor.Name("Test")
-                .MemberAccess(AccessTypes.Private)
+                .Access(AccessFlags.Private)
                 .Body("this.connection = initString;")
-                .Builder().Script;
+                .Script;
 
-            Assert.Equal("private Test(){this.connection = initString;}", result);
+            Assert.Equal($"private Test(){{this.connection = initString;}}", result);
         }
 
 
@@ -40,13 +39,13 @@ namespace NatashaUT
         [Fact(DisplayName = "静态初始化函数")]
         public void TestCtor3()
         {
-            CtorTemplate ctor = new CtorTemplate();
+            CtorBuilder ctor = new CtorBuilder();
             string result = ctor.Name("Test")
-                .MemberModifier(Modifiers.Static)
+                .Modifier(ModifierFlags.Static)
                 .Body("this.connection = initString;")
-                .Builder().Script;
+                .Script;
 
-            Assert.Equal("static Test(){this.connection = initString;}", result);
+            Assert.Equal($"static Test(){{this.connection = initString;}}", result);
         }
     }
 }

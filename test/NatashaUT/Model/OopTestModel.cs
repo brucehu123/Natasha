@@ -2,7 +2,7 @@
 
 namespace NatashaUT.Model
 {
-    class OopTestModel
+    public class OopTestModel
     {
 
         public void ReWrite1()
@@ -18,6 +18,21 @@ namespace NatashaUT.Model
         {
 
         }
+
+
+        public virtual ref int ReWrite4(ref int i,out string temp)
+        {
+            temp = default;
+            return ref i;
+        }
+
+        public class InnerClass 
+        {
+
+            public string Name;
+
+        }
+
 
     }
 }

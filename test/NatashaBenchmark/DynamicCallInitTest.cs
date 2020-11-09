@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Natasha;
-using Natasha.Operator;
+using Natasha.CSharp;
 using NatashaBenchmark.Model;
 using System;
 using System.Reflection;
@@ -32,7 +31,7 @@ namespace NatashaBenchmark
             il.Emit(OpCodes.Newobj, ctor);
             il.Emit(OpCodes.Ret);
             EmitFunc = (Func<CallModel>)(method.CreateDelegate(typeof(Func<CallModel>)));
-            NatashaFunc = CtorOperator.NewDelegate<CallModel>();
+            NatashaFunc = NInstance.Creator<CallModel>();
         }
         public void Preheating()
         {
@@ -53,6 +52,11 @@ namespace NatashaBenchmark
         public void OriginInitTest()
         {
             CallModel model = new CallModel();
+        }
+        [Benchmark( Description = "Activator")]
+        public void ActivatorTest()
+        {
+            CallModel model = Activator.CreateInstance<CallModel>();
         }
         [Benchmark(Description = "NatashaInitor")]
         public void DynamicInitTest()

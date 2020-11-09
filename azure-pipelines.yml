@@ -21,14 +21,18 @@ jobs:
 
 - job: Linux
   pool:
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
 
   
   steps:
-  - task: DotNetCoreInstaller@0
+
+
+  - task: DotNetCoreInstaller@1
     displayName: install
     inputs:
-      version: '2.2.300'
+      version: '3.1.100'
+
+      
 
 
   - task: DotNetCoreCLI@1
@@ -50,20 +54,23 @@ jobs:
     displayName: test
     inputs:
       command: test
+      projects: './test/NatashaUT'
 
 
 
 
 - job: macOS
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: 'macOS-latest'
 
 
   steps:
-  - task: DotNetCoreInstaller@0
+
+
+  - task: DotNetCoreInstaller@1
     displayName: install
     inputs:
-      version: '2.2.300'
+      version: '3.1.100'
 
 
   - task: DotNetCoreCLI@1
@@ -85,20 +92,23 @@ jobs:
     displayName: test
     inputs:
       command: test
+      projects: './test/NatashaUT'
 
 
 
 
 - job: Windows
   pool:
-    vmImage: 'windows-2019'
+    vmImage: 'windows-latest'
 
 
   steps:
-  - task: DotNetCoreInstaller@0
+
+
+  - task: DotNetCoreInstaller@1
     displayName: install
     inputs:
-      version: '2.2.300'
+      version: '3.1.100'
 
 
   - task: DotNetCoreCLI@1
@@ -120,3 +130,4 @@ jobs:
     displayName: test
     inputs:
       command: test
+      projects: './test/NatashaUT'

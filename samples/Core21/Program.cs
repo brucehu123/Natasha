@@ -1,5 +1,8 @@
 ﻿using Natasha;
+using Natasha.CSharp;
+using Natasha.CSharp.Builder;
 using System;
+using System.Collections.Generic;
 
 namespace Core21
 {
@@ -7,77 +10,63 @@ namespace Core21
     {
         static void Main(string[] args)
         {
-            /*
-             *   在此之前，你需要右键，选择工程文件，在你的.csproj里面 
-             *   
-             *   写上这样一句浪漫的话： 
-             *   
-             *      <PreserveCompilationContext>true</PreserveCompilationContext>
-             */
+            NatashaInitializer.InitializeAndPreheating();
+            //var @operator = FastMethodOperator.DefaultDomain();
+            //var actionDelegate = @operator
+            //    .Param(typeof(string), "parameter")
+            //    .Body("Console.WriteLine(parameter);")
+            //    .Compile();
 
-            string text = @"using System;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using ClassLibrary1;
- 
-namespace HelloWorld
-{
-    public class Test
-    {
-        public Test(){
-            Name=""111"";
-        }
+            //actionDelegate.DynamicInvoke("HelloWorld!");
+            //var action = (Action<string>)actionDelegate;
+            //action("HelloWorld!");
+            //actionDelegate.DisposeDomain();
 
-        public string Name;
-        public int Age{get;set;}
+            //起个类
+            NClass nClass = NClass.DefaultDomain();
+            nClass
+                .Namespace("MyNamespace")
+                .Public()
+                .Name("MyClass")
+                .Ctor(ctor=>ctor.Public().Body("MyField=\"Hello\";"))
+                .Property(prop => prop
+                    .Type(typeof(string))
+                    .Name("MyProperty")
+                    .Public()
+                    .OnlyGetter("return \"World!\";")
+                    );
 
-        public override string ToString(){
 
-            Class1 a = new Class1();
-            a.Show1();
-            Class1.Show2();
-            return ""11"";
+            //添加方法
+            MethodBuilder mb = new MethodBuilder();
+            mb
+                .Public()
+                .Override()
+                .Name("ToString")
+                .Body("return MyField+\" \"+MyProperty;")
+                .Return(typeof(string));
+            nClass.Method(mb);
 
-        }
 
-        public static int Get(int temp){
+            //添加字段
+            FieldBuilder fb = nClass.GetFieldBuilder();
+            fb.Public()
+                .Name("MyField")
+                .Type<string>();
 
-            switch (temp)
-            {
-                case 100:
-                    temp = 1;
-                    break;
-                case 200:
-                    temp = 333;
-                    break;
-                case 300:
-                    temp = 645;
-                    break;
-                case 400:
-                    temp = 1412;
-                    break;
-                case 500:
-                    temp = 653;
-                    break;
-                case 600:
-                    temp = 2988;
-                    break;
 
-                default:
-                    temp = 2019;
-                    break;
-            }
-            return temp;
-        }
-    }
-}";
-            //根据脚本创建动态类
-            OopComplier oop = new OopComplier();
-            oop.LoadFile(@"D:\Project\IlTest\ClassLibrary1\bin\Debug\netstandard2.0\ClassLibrary1.dll");
-            Type type = oop.GetClassType(text);
-            var a = Activator.CreateInstance(type);
-            Console.WriteLine(a.ToString());
+            //动态调用动态创建的类
+            var action = NDelegate
+                .RandomDomain()
+                .Action("Console.WriteLine((new MyClass()).ToString());", nClass.GetType());
+
+            action();
+            action.DisposeDomain();
+            //Console.WriteLine(typeof(List<int>[]).GetRuntimeName());
+            //Console.WriteLine(typeof(List<int>[,]).GetRuntimeName());
+            //Console.WriteLine(typeof(int[,]).GetRuntimeName());
+            //Console.WriteLine(typeof(int[][]).GetRuntimeName());
+            //Console.WriteLine(typeof(int[][,,,]).GetRuntimeName());
             Console.ReadKey();
         }
     }
